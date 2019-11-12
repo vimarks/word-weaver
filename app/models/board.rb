@@ -30,8 +30,8 @@ class Board < ApplicationRecord
       #  then you shrink it to a string
       new_board = dice.shuffle.map{ |die| die[rand(1..6)-1]}.join()
       
-      
       self.letter_pop = new_board
     end
   end
+
 end
