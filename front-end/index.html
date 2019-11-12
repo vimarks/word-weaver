@@ -2,13 +2,22 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title></title>
+    <h3><title>WORD-WEAVER</title></h3>
   </head>
   <body>
-    <form class="" action="index.html" method="post">
+    <form id="welcome-form" class="welcome-form" action="index.html" method="post">
       <select class="" name="num_players">
 
+        <option value="1">1-Player</option>
+        <option value="2">2-Player</option>
+        <option value="3">3-Player</option>
+
       </select>
+        <input id="p1username" type="text" name="" value="" placeholder="username1">
+        <input id="p2username" style="display:none" type="text" name="" value="" placeholder="username2">
+        <input id="p3username" style="display:none" type="text" name="" value="" placeholder="username3">
+
+        <button id= "start-game" type="submit" name="button">start game</button>
     </form>
     <div id="player-names" class="">
 
@@ -43,10 +52,14 @@
 
       </div>
 
-      <div id="display-box" class="">
-
+      <div id="display-box" class="visibility">
 
       </div>
+      <button id= "word-submit" class="visibility" type="button" name="button">submit word</button>  <button id= "clear" class="visibility" type="button" name="button">clear</button>
+
+      <ul id="word-list" class="visibility" >
+
+      </ul>
 
 
 
