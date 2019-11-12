@@ -1,7 +1,7 @@
 let displayBox = document.getElementById("display-box")
 document.addEventListener("DOMContentLoaded", function(){
 
-hideBoard()
+// hideBoard()
 initializePlayerForm()
 
 function hideBoard(){
@@ -52,12 +52,44 @@ function playerFormHandler(e){
     player2Box.style.display = "initial"
     player3Box.style.display = "initial"
   }
+debugger;
+  let startGameButton = document.getElementById("start-game")
+  startGameButton.addEventListener("click", startGame )
 
-  // let startGameButton = document.getElementById("start-game")
-  // startGameButton.addEventListener("click",function{
-  //
-  // })
+  function startGame(e){
+    e.preventDefault()
 
+    let username1 = document.getElementById("p1username").value;
+    let username2 = document.getElementById("p2username").value;
+    let username3 = document.getElementById("p3username").value;
+
+
+    //bundle data
+
+    let formData = {
+      player1: username1,
+      player2: username2,
+      player3: username3
+      }
+
+    let configObj = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify(formData)
+    }
+    fetch( "http://localhost:3000/user", configObj)
+    .then(function (response){
+      return response.json()
+    })
+    .then(function(newUsers){
+      debugger;
+
+    })
+
+  }
 
 }
 
