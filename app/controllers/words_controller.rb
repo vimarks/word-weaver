@@ -3,11 +3,11 @@ class WordsController < ApplicationController
         # should have a param of a word
         # byebug
         word=params["word"]
-        response = Word.lookup(word)
+        oxford_api_response = Word.lookup(word)
         
         
         
-        if response.error
+        if oxford_api_response.error
             render json: {error: "word not valid"},status: :not_found
         else
             # is a word
