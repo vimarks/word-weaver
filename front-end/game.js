@@ -85,8 +85,8 @@ function playerFormHandler(e){
     fetch( "http://localhost:3000/users", configObj)
     .then(function (response){
       return response.json()})
-    .then(function(newUsers)
-    {})
+    .then(function(userArray)
+    {debugger;userArray})
 
   }
 
@@ -97,7 +97,9 @@ function playerFormHandler(e){
 
 // ****************************************************************************
 // steven's side of the wall
+
 let timerCountDown = document.getElementById("timer-count-down")
+
 
 let buttonsArray = document.querySelectorAll(".letter-button")
  buttonsArray.forEach((button) => {button.addEventListener("click", renderLetter)})
@@ -137,6 +139,7 @@ function sendWordToBackend(word){
       return response.json()
     })
     .then(function(parsedResponse){
+
       
       // apply the results of the backend response
       let wordValid = false
