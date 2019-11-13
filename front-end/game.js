@@ -187,6 +187,18 @@ function gameTimerEnded(){
   // should submit ended game and start new game if appropriate
 }
 
+
+function updateBoardLetters(letter_pop){
+  // takes in 16 character string and assigns letters to the appropriate button
+  [...letter_pop].forEach(function(letter, index){
+    let row = Math.floor(index/4)+1
+    let column = index%4+1
+    // button id are formatted R1-L1
+    currentButton = getElementById(`R${row}-L${column}`)
+    currentButton.innerText = letter
+  })
+}
+
 startTimerCountDown(3)
 function startTimerCountDown(timeLimit){
   // time limit is the number of minutes the game will last
@@ -214,6 +226,7 @@ function setTimerCountDown(timeLeft){
   let seconds = timeLeft%60
   timerCountDown.innerText = `${minutes}:${seconds}`
 }
+
 
 
 
