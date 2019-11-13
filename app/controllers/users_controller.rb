@@ -1,13 +1,28 @@
 class UsersController < ApplicationController
 
   def create
-
-    resource_params[:users].each do |user| if user[:username] != ""
-      then User.create(user)
+    newBoard = Board.new
+    newBoard.new_letters
+    newBoard.save
+    gameArray = []
+    userArray = []
+    resource_params[:users].each do |user|
+       if user[:username] != ""
+         currentUser = User.create(user)
+         userArray.push(currentUser)
+         newGame = Game.create(user_id: currentUser.id, board_id: newBoard.id)
+         gameArray.push(newGame)
+       end
     end
+
+    render json: {
+      users: userArray,
+      board: newBoard.letter_pop,
+      games: gameArray
+    }
+
+
   end
-  
-end
 
 
 
