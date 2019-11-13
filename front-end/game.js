@@ -52,7 +52,6 @@ function playerFormHandler(e){
     player2Box.style.display = "initial"
     player3Box.style.display = "initial"
   }
-
   let startGameButton = document.getElementById("start-game")
   startGameButton.addEventListener("click", startGame )
 
@@ -64,13 +63,14 @@ function playerFormHandler(e){
     let username3 = document.getElementById("p3username").value;
 
 
-    //bundle data
+    //bundle data as array of hashes
 
-    let formData = {
-      player1: username1,
-      player2: username2,
-      player3: username3
-      }
+    let formData = { users: [
+      {username: username1},
+      {username: username2},
+      {username: username3}
+    ]}
+
 
     let configObj = {
       method: "POST",
@@ -82,13 +82,9 @@ function playerFormHandler(e){
     }
     fetch( "http://localhost:3000/users", configObj)
     .then(function (response){
-      debugger;
-      return response.json()
-    })
-    .then(function(newUsers){
-      
-
-    })
+      return response.json()})
+    .then(function(newUsers)
+    {})
 
   }
 
