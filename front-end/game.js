@@ -1,3 +1,5 @@
+
+// displayBox is the div Element that displays the current word the user is making
 let displayBox = document.getElementById("display-box")
 document.addEventListener("DOMContentLoaded", function(){
 
@@ -98,15 +100,60 @@ function playerFormHandler(e){
 
 
 // ****************************************************************************
-
+// steven's side of the wall
 let buttonsArray = document.querySelectorAll(".letter-button")
  buttonsArray.forEach((button) => {button.addEventListener("click", renderLetter)})
 let subButton = document.getElementById("word-submit")
-subButton.addEventListener("click", listWord)
+subButton.addEventListener("click", submitWordClicked)
 let clearButton = document.getElementById("clear")
 clearButton.addEventListener("click", function(e){
   displayBox.innerText = ""
 })
+
+function submitWordClicked(event){
+  let currentWord = displayBox.innerText
+  if (currentWord.length > 2){
+    sendWordToBackend(currentWord)
+  }
+
+}
+
+
+function sendWordToBackend(word){
+  // sends word to backend and returns true if valid, false otherwise
+  // bundle the word as an object with key word
+  let bodyObj = {word: word}
+  // create a configuration object to send to the words controller back end
+  let configObj = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json"
+    },
+    body: JSON.stringify(bodyObj)
+  }
+
+
+  fetch( "http://localhost:3000/words", configObj)
+    .then(function (response){
+      return response.json()
+    })
+    .then(function(parsedResponse){
+      
+      // apply the results of the backend response
+      let wordValid = false
+      if (parsedResponse.word){
+        wordValid = true
+      }
+      if ( wordValid ){
+        listWord(word)
+      } else {
+        alert("word not valid")
+      }
+    })
+
+}
+
 
 
 function renderLetter(e){
@@ -117,15 +164,13 @@ function renderLetter(e){
 }
 
 
-function listWord(e){
+function listWord(word){
+  // finds UL, creates new li, appends li to ul
   let wordUl = document.getElementById("word-list")
   let wordLi = document.createElement("li")
-  wordLi.innerText = displayBox.innerText
-  if (displayBox.innerText.length > 2){
-    wordUl.append(wordLi)
-    // fetch post to backend
-    displayBox.innerText = ""
-    }
+  wordLi.innerText = word
+  wordUl.append(wordLi)
+  displayBox.innerText = ""
 }
 
 
