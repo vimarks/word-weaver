@@ -97,6 +97,8 @@ function playerFormHandler(e){
 
 // ****************************************************************************
 // steven's side of the wall
+let timerCountDown = document.getElementById("timer-count-down")
+
 let buttonsArray = document.querySelectorAll(".letter-button")
  buttonsArray.forEach((button) => {button.addEventListener("click", renderLetter)})
 let subButton = document.getElementById("word-submit")
@@ -138,14 +140,17 @@ function sendWordToBackend(word){
       
       // apply the results of the backend response
       let wordValid = false
+
       if (parsedResponse.word){
         wordValid = true
       }
+
       if ( wordValid ){
         listWord(word)
       } else {
         alert("word not valid")
       }
+
     })
 
 }
@@ -169,6 +174,43 @@ function listWord(word){
   displayBox.innerText = ""
 }
 
+function startGameTimer(timeLimit){
+  // starts a timer for the game, calls gameTimerEnded after elapsed time
+  // time limit is the number of minutes the game will last
+  let endTime = timeLimit*60*1000
+  window.setTimeout(gameTimerEnded, endTime)
+}
+function gameTimerEnded(){
+  // should submit ended game and start new game if appropriate
+}
+
+startTimerCountDown(3)
+function startTimerCountDown(timeLimit){
+  // time limit is the number of minutes the game will last
+  timerCountDown.innerText=`${timeLimit}:00`
+  window.setInterval(updateTimerCountDown,1000)
+}
+function getTimerCountDown(){
+  
+  let [minutes, seconds] = timerCountDown.innerText.split(":")
+  minutes = parseInt(minutes)
+  seconds = parseInt(seconds)
+  seconds = seconds + minutes*60
+  
+  return seconds
+}
+function updateTimerCountDown(){
+  let currentTime = getTimerCountDown()
+  if (currentTime > 0){
+    setTimerCountDown(currentTime-1)
+  } 
+  
+}
+function setTimerCountDown(timeLeft){
+  let minutes = Math.floor(timeLeft/60)
+  let seconds = timeLeft%60
+  timerCountDown.innerText = `${minutes}:${seconds}`
+}
 
 
 
