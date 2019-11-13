@@ -52,7 +52,7 @@ function playerFormHandler(e){
     player2Box.style.display = "initial"
     player3Box.style.display = "initial"
   }
-debugger;
+
   let startGameButton = document.getElementById("start-game")
   startGameButton.addEventListener("click", startGame )
 
@@ -80,12 +80,13 @@ debugger;
       },
       body: JSON.stringify(formData)
     }
-    fetch( "http://localhost:3000/user", configObj)
+    fetch( "http://localhost:3000/users", configObj)
     .then(function (response){
+      debugger;
       return response.json()
     })
     .then(function(newUsers){
-      debugger;
+      
 
     })
 
