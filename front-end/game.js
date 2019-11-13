@@ -1,3 +1,5 @@
+
+// displayBox is the div Element that displays the current word the user is making
 let displayBox = document.getElementById("display-box")
 document.addEventListener("DOMContentLoaded", function(){
 
@@ -52,7 +54,6 @@ function playerFormHandler(e){
     player2Box.style.display = "initial"
     player3Box.style.display = "initial"
   }
-
   let startGameButton = document.getElementById("start-game")
   startGameButton.addEventListener("click", startGame )
 
@@ -64,13 +65,14 @@ function playerFormHandler(e){
     let username3 = document.getElementById("p3username").value;
 
 
-    //bundle data
+    //bundle data as array of hashes
 
-    let formData = {
-      player1: username1,
-      player2: username2,
-      player3: username3
-      }
+    let formData = { users: [
+      {username: username1},
+      {username: username2},
+      {username: username3}
+    ]}
+
 
     let configObj = {
       method: "POST",
@@ -82,13 +84,9 @@ function playerFormHandler(e){
     }
     fetch( "http://localhost:3000/users", configObj)
     .then(function (response){
-      debugger;
-      return response.json()
-    })
-    .then(function(newUsers){
-      
-
-    })
+      return response.json()})
+    .then(function(newUsers)
+    {})
 
   }
 
@@ -98,15 +96,65 @@ function playerFormHandler(e){
 
 
 // ****************************************************************************
+// steven's side of the wall
+let timerCountDown = document.getElementById("timer-count-down")
 
 let buttonsArray = document.querySelectorAll(".letter-button")
  buttonsArray.forEach((button) => {button.addEventListener("click", renderLetter)})
 let subButton = document.getElementById("word-submit")
-subButton.addEventListener("click", listWord)
+subButton.addEventListener("click", submitWordClicked)
 let clearButton = document.getElementById("clear")
 clearButton.addEventListener("click", function(e){
   displayBox.innerText = ""
 })
+
+function submitWordClicked(event){
+  let currentWord = displayBox.innerText
+  if (currentWord.length > 2){
+    sendWordToBackend(currentWord)
+  }
+
+}
+
+
+function sendWordToBackend(word){
+  // sends word to backend and returns true if valid, false otherwise
+  // bundle the word as an object with key word
+  let bodyObj = {word: word}
+  // create a configuration object to send to the words controller back end
+  let configObj = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json"
+    },
+    body: JSON.stringify(bodyObj)
+  }
+
+
+  fetch( "http://localhost:3000/words", configObj)
+    .then(function (response){
+      return response.json()
+    })
+    .then(function(parsedResponse){
+      
+      // apply the results of the backend response
+      let wordValid = false
+
+      if (parsedResponse.word){
+        wordValid = true
+      }
+
+      if ( wordValid ){
+        listWord(word)
+      } else {
+        alert("word not valid")
+      }
+
+    })
+
+}
+
 
 
 function renderLetter(e){
@@ -117,16 +165,25 @@ function renderLetter(e){
 }
 
 
-function listWord(e){
+function listWord(word){
+  // finds UL, creates new li, appends li to ul
   let wordUl = document.getElementById("word-list")
   let wordLi = document.createElement("li")
-  wordLi.innerText = displayBox.innerText
-  if (displayBox.innerText.length > 2){
-    wordUl.append(wordLi)
-    // fetch post to backend
-    displayBox.innerText = ""
-    }
+  wordLi.innerText = word
+  wordUl.append(wordLi)
+  displayBox.innerText = ""
 }
+
+function startGameTimer(timeLimit){
+  // starts a timer for the game, calls gameTimerEnded after elapsed time
+  // time limit is the number of minutes the game will last
+  let endTime = timeLimit*60*1000
+  window.setTimeout(gameTimerEnded, endTime)
+}
+function gameTimerEnded(){
+  // should submit ended game and start new game if appropriate
+}
+
 
 function updateBoardLetters(letter_pop){
   // takes in 16 character string and assigns letters to the appropriate button
@@ -138,6 +195,36 @@ function updateBoardLetters(letter_pop){
     currentButton.innerText = letter
   })
 }
+
+startTimerCountDown(3)
+function startTimerCountDown(timeLimit){
+  // time limit is the number of minutes the game will last
+  timerCountDown.innerText=`${timeLimit}:00`
+  window.setInterval(updateTimerCountDown,1000)
+}
+function getTimerCountDown(){
+  
+  let [minutes, seconds] = timerCountDown.innerText.split(":")
+  minutes = parseInt(minutes)
+  seconds = parseInt(seconds)
+  seconds = seconds + minutes*60
+  
+  return seconds
+}
+function updateTimerCountDown(){
+  let currentTime = getTimerCountDown()
+  if (currentTime > 0){
+    setTimerCountDown(currentTime-1)
+  } 
+  
+}
+function setTimerCountDown(timeLeft){
+  let minutes = Math.floor(timeLeft/60)
+  let seconds = timeLeft%60
+  timerCountDown.innerText = `${minutes}:${seconds}`
+}
+
+
 
 
 function getGameboard(){
