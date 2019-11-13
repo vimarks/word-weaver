@@ -16,7 +16,7 @@ class Word < ApplicationRecord
         # puts response
         client = OxfordDictionary::Client.new(app_id: ENV['OXFORD_API_APP_ID'], app_key: ENV['OXFORD_API_APP_KEY'])
         response = client.lemma(word: word, language: 'en', params: {})
-      puts response
+      
       return response
   end
 end
