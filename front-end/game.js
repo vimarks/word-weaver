@@ -85,14 +85,48 @@ function playerFormHandler(e){
     fetch( "http://localhost:3000/users", configObj)
     .then(function (response){
       return response.json()})
-    .then(function(userArray)
-    {debugger;userArray})
+    .then(function(dataObj){
+      let gamesArray = dataObj["games"]
+      let gameIds = gamesArray.map(game => game.id)
+      sessionStorage.setItem("game_ids",gameIds)
+
+      let usersArray = dataObj["users"]
+      let userIds = usersArray.map(user => user.id)
+      sessionStorage.setItem("user_ids",userIds)
+
+      let usernames = usersArray.map(user => user.username)
+      sessionStorage.setItem("usernames",usernames)
+
+      let boardString = dataObj["board"]
+      sessionStorage.setItem("board",boardString)
+      updateBoardLetters(boardString)
+      displayCurrentPlayer()
+      // gameTimerEnded()
+    })
 
   }
 
 }
 
+function displayCurrentPlayer(){
+  let currentPlayerNav = document.getElementById("current-player")
+  let roundMemberList = sessionStorage.getItem("usernames")
+  currentPlayerNav.innerText = roundMemberList.split(",")[0]
+  let playingNext = document.getElementById("playing-next")
 
+  roundMemberList = roundMemberList.split(",")
+  if (roundMemberList.length === 3) {
+    playingNext.innerText = roundMemberList.slice(-2)
+  } else {
+    playingNext.innerText = roundMemberList[1]
+  }
+}
+
+function updateRoundMemberList(){
+  let roundMemberList = sessionStorage.getItem("usernames").split(",")
+  roundMemberList.shift()
+  sessionStorage.setItem("usernames",roundMemberList)
+}
 
 
 // ****************************************************************************
@@ -140,7 +174,7 @@ function sendWordToBackend(word){
     })
     .then(function(parsedResponse){
 
-      
+
       // apply the results of the backend response
       let wordValid = false
 
@@ -184,8 +218,41 @@ function startGameTimer(timeLimit){
   window.setTimeout(gameTimerEnded, endTime)
 }
 function gameTimerEnded(){
+  let roundMemberList = sessionStorage.getItem("usernames").split(",")
+  if(roundMemberList.length != 0){
+    updateRoundMemberList()
+    startVisualGame(nextPlayer)
+
+  }else {
+    submitEndedRound()
+    endRound()
+  }
+
+
+
+
+
+
   // should submit ended game and start new game if appropriate
+  //clear sessionStorage
 }
+function startVisualGame(){
+  startTimerCountDown(3)
+  startGameTimer(3)
+  displayBox = ""
+  //reset timerCountDown/
+  //clear displayBox
+  //display currentPlayer
+}
+
+function submitEndedRound(){
+  let currentGames = sessionStorage.getItem("games").split(",")
+  getAllGameWordsFromServer(currentGames)
+}
+
+// function startNextRound(nextPlayer){
+//   let nextPlayer =
+// }
 
 
 function updateBoardLetters(letter_pop){
@@ -206,20 +273,20 @@ function startTimerCountDown(timeLimit){
   window.setInterval(updateTimerCountDown,1000)
 }
 function getTimerCountDown(){
-  
+
   let [minutes, seconds] = timerCountDown.innerText.split(":")
   minutes = parseInt(minutes)
   seconds = parseInt(seconds)
   seconds = seconds + minutes*60
-  
+
   return seconds
 }
 function updateTimerCountDown(){
   let currentTime = getTimerCountDown()
   if (currentTime > 0){
     setTimerCountDown(currentTime-1)
-  } 
-  
+  }
+
 }
 function setTimerCountDown(timeLeft){
   let minutes = Math.floor(timeLeft/60)
@@ -230,9 +297,7 @@ function setTimerCountDown(timeLeft){
 
 
 
-function getGameboard(){
-  // fetch predetermined rows
-}
+
 
 
 })
