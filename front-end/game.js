@@ -106,9 +106,13 @@ let buttonsArray = document.querySelectorAll(".letter-button")
 let subButton = document.getElementById("word-submit")
 subButton.addEventListener("click", submitWordClicked)
 let clearButton = document.getElementById("clear")
-clearButton.addEventListener("click", function(e){
+clearButton.addEventListener("click", clearCurrentWord)
+
+
+function clearCurrentWord(e){
+  clearButtonDataSet()
   displayBox.innerText = ""
-})
+}
 
 function submitWordClicked(event){
   let currentWord = displayBox.innerText
@@ -161,9 +165,19 @@ function sendWordToBackend(word){
 
 
 function renderLetter(e){
-
-
-   displayBox.innerText = displayBox.innerText + e.target.innerText
+  let currentButton = event.target
+  
+  if(displayBox.dataset.usedButtons && displayBox.dataset.usedButtons.includes(currentButton.id)){
+    // there are usedButtons and the current button is used
+    // do nothing
+  } else { 
+    // its an unused button
+    // add to dataset and add to displaybox
+    addButtonToDataSet(currentButton)
+    displayBox.innerText = displayBox.innerText + currentButton.innerText
+  }
+  
+   
 
 }
 
