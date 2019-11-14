@@ -134,15 +134,28 @@ function updateBoardLetters(letter_pop){
     let row = Math.floor(index/4)+1
     let column = index%4+1
     // button id are formatted R1-L1
-    currentButton = getElementById(`R${row}-L${column}`)
+    currentButton = document.getElementById(`R${row}-L${column}`)
     currentButton.innerText = letter
   })
 }
+updateBoardLetters("letsgoteamschema")
 
 
 function getGameboard(){
   // fetch predetermined rows
 }
 
+function addButtonToDataSet(buttonElement){
+  
+  if (displayBox.dataset.usedButtons){
+    displayBox.dataset.usedButtons += " " + buttonElement.id
+  } else {
+    displayBox.dataset.usedButtons += " " + buttonElement.id
+  }
+}
+
+function clearButtonDataSet(){
+  displayBox.removeAttribute("data-used-buttons")
+}
 
 })
