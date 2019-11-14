@@ -126,7 +126,11 @@ function displayCurrentPlayer(){
   roundMemberList = roundMemberList.split(",")
   if (roundMemberList.length === 3) {
     playingNext.innerText = roundMemberList.slice(-2)
-  } else {
+  }
+  else if ( roundMemberList.length === 1) {
+    playingNext.innerText = "queue empty"
+  }
+  else {
     playingNext.innerText = roundMemberList[1]
   }
 }
@@ -266,8 +270,8 @@ function gameTimerEnded(){
   if(roundMemberList.length != 0){
     updateRoundMemberList()
     updateRoundGamesList()
-
     startVisualGame()
+    debugger;
 
   }else {
     submitEndedRound()
@@ -288,6 +292,7 @@ function startVisualGame(){
   startGameTimer(1)
   clearCurrentWord()
   clearWordList()
+  displayCurrentPlayer()
 
 
   //reset timerCountDown/
