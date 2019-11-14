@@ -151,16 +151,21 @@ function clearCurrentWord(e){
 function submitWordClicked(event){
   let currentWord = displayBox.innerText
   if (currentWord.length > 2){
-    sendWordToBackend(currentWord)
+    sendWordToBackend(currentWord,currentGameId)
   }
 
 }
 
 
-function sendWordToBackend(word){
+function sendWordToBackend(word, game_id = 0){
   // sends word to backend and returns true if valid, false otherwise
-  // bundle the word as an object with key word
-  let bodyObj = {word: word}
+  // bundle the word as an object with key word, and an id of the game
+  // so the word is saved to a game
+
+  let bodyObj = {
+    word: word,
+    game_id: game_id
+  }
   // create a configuration object to send to the words controller back end
   let configObj = {
     method: "POST",
@@ -326,5 +331,53 @@ function addButtonToDataSet(buttonElement){
 function clearButtonDataSet(){
   displayBox.removeAttribute("data-used-buttons")
 }
+
+function getAllGameWordsFromServer(gameIdArray=[1,2,3,4]){
+  // test with default [1,2,3,4]
+  // takes an array of game_ids and sends them to the api 
+  // route is the games index
+  let bodyObj = {
+    game_ids: gameIdArray
+  }
+  // create a configuration object to send to the words controller back end
+  let configObj = {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json"
+    },
+    body: JSON.stringify(bodyObj)
+  }
+  fetch( "http://localhost:3000/games/1", configObj)
+    .then(function (response){
+      return response.json()
+    })
+    .then(function(userWordArray){
+      // response should be an array
+      // of objects with structure 
+      // {user: username, words:[word1,word2,...] }
+      userWordArray.forEach(userWord=>displayGameWords(userWord))
+    })
+    .catch(
+      window.alert("these aren't the games you're looking for")
+    )
+
+  }
+  function displayGameWords(userWordObject){
+    // input should be an object with structure 
+    // {user: username, words:[word1,word2,...] }
+    let userNameHeader = document.createElement("h2")
+    userNameHeader.innerText = userWordObject.user
+    let wordList = document.createElement("ul")
+    userWordObject.words.forEach(word=>{
+      let userWordLi = document.createElement("li")
+      userWordLi.innerText = word
+      wordList.append(userWordLi)
+    })
+    document.getElementById("round-word-list").append(userNameHeader, wordList)
+
+  }
+  getAllGameWordsFromServer([5,6,7,8])
+
 
 })
