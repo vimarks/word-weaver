@@ -1,6 +1,7 @@
 
 // displayBox is the div Element that displays the current word the user is making
 let displayBox = document.getElementById("display-box")
+let timerCountDownInterval
 document.addEventListener("DOMContentLoaded", function(){
 
 // hideBoard()
@@ -214,6 +215,7 @@ function sendWordToBackend(word, game_id = 0){
 
       if ( wordValid ){
         listWord(word)
+        clearCurrentWord()
       } else {
         alert("word not valid")
       }
@@ -325,7 +327,7 @@ updateBoardLetters("letsgoteamschema")
 function startTimerCountDown(timeLimit){
   // time limit is the number of minutes the game will last
   timerCountDown.innerText=`${timeLimit}:00`
-  window.setInterval(updateTimerCountDown,1000)
+  timerCountDownInterval = setInterval(updateTimerCountDown,1000)
 }
 
 function getTimerCountDown(){
@@ -341,7 +343,13 @@ function getTimerCountDown(){
 function updateTimerCountDown(){
   let currentTime = getTimerCountDown()
   if (currentTime > 0){
+    if (currentTime-1 == 0){
+      clearInterval(timerCountDownInterval)
+    }
     setTimerCountDown(currentTime-1)
+  } else if (currentTime == 0){
+    debugger
+    clearInterval(timerCountDownInterval)
   }
 
 }
