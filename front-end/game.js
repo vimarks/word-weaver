@@ -5,11 +5,13 @@ document.addEventListener("DOMContentLoaded", function(){
 
 // hideBoard()
 initializePlayerForm()
+let startGameButton = document.getElementById("start-game")
+startGameButton.addEventListener("click", startRound )
 
 function hideBoard(){
 
   let buttonsArray = document.querySelectorAll(".letter-button")
-  buttonsArray.forEach((button) => {button.classList.add("visibility")})
+  buttonsArray.forEach( (button) => {button.classList.add("visibility")} )
   let gameDisplay = document.querySelectorAll(".visibility")
   gameDisplay.forEach(function(element){
    element.style.display = "none"
@@ -46,65 +48,71 @@ function playerFormHandler(e){
   let playerSelector = document.querySelector("select")
 
   if (playerSelector.value === "2"){
-    player2Box.style.display = "initial"
+    player2Box.style.display = "inline"
 
   }
 
   if (playerSelector.value === "3"){
-    player2Box.style.display = "initial"
-    player3Box.style.display = "initial"
+    player2Box.style.display = "inline"
+    player3Box.style.display = "inline"
   }
-  let startGameButton = document.getElementById("start-game")
-  startGameButton.addEventListener("click", startGame )
-
-  function startGame(e){
-    e.preventDefault()
-
-    let username1 = document.getElementById("p1username").value;
-    let username2 = document.getElementById("p2username").value;
-    let username3 = document.getElementById("p3username").value;
 
 
-    //bundle data as array of hashes
-
-    let formData = { users: [
-      {username: username1},
-      {username: username2},
-      {username: username3}
-    ]}
 
 
-    let configObj = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-      },
-      body: JSON.stringify(formData)
-    }
-    fetch( "http://localhost:3000/users", configObj)
-    .then(function (response){
-      return response.json()})
-    .then(function(dataObj){
-      let gamesArray = dataObj["games"]
-      let gameIds = gamesArray.map(game => game.id)
-      sessionStorage.setItem("game_ids",gameIds)
+}
 
-      let usersArray = dataObj["users"]
-      let userIds = usersArray.map(user => user.id)
-      sessionStorage.setItem("user_ids",userIds)
+function startRound(e){
+  e.preventDefault()
 
-      let usernames = usersArray.map(user => user.username)
-      sessionStorage.setItem("usernames",usernames)
+  let username1 = document.getElementById("p1username").value;
+  let username2 = document.getElementById("p2username").value;
+  let username3 = document.getElementById("p3username").value;
 
-      let boardString = dataObj["board"]
-      sessionStorage.setItem("board",boardString)
-      updateBoardLetters(boardString)
-      displayCurrentPlayer()
-      // gameTimerEnded()
-    })
 
+  //bundle data as array of hashes
+
+  let formData = { users: [
+    {username: username1},
+    {username: username2},
+    {username: username3}
+  ]}
+
+
+  let configObj = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json"
+    },
+    body: JSON.stringify(formData)
   }
+  fetch( "http://localhost:3000/users", configObj)
+  .then(function (response){
+    return response.json()})
+  .then(function(dataObj){
+    let gamesArray = dataObj["games"]
+    let gameIds = gamesArray.map(game => game.id)
+    sessionStorage.setItem("game_ids",gameIds)
+    sessionStorage.setItem("completed_games","")
+
+    let usersArray = dataObj["users"]
+    let userIds = usersArray.map(user => user.id)
+    sessionStorage.setItem("user_ids",userIds)
+
+    let usernames = usersArray.map(user => user.username)
+    sessionStorage.setItem("usernames",usernames)
+
+    let boardString = dataObj["board"]
+    sessionStorage.setItem("board",boardString)
+    updateBoardLetters(boardString)
+
+    let player = sessionStorage.getItem("usernames").split(",")[0]
+    startVisualGame(player)
+    displayCurrentPlayer()
+    // gameTimerEnded()
+
+  })
 
 }
 
@@ -128,6 +136,13 @@ function updateRoundMemberList(){
   sessionStorage.setItem("usernames",roundMemberList)
 }
 
+function updateRoundGamesList(){
+  let roundGames = sessionStorage.getItem("game_ids").split(",")
+  let completedGames = sessionStorage.getItem("completed_games").split(",")
+  completedGames.push(roundGames.shift())
+  sessionStorage.setItem("completed_games", completedGames)
+  sessionStorage.setItem("game_ids", roundGames)
+}
 
 // ****************************************************************************
 // steven's side of the wall
@@ -151,6 +166,8 @@ function clearCurrentWord(e){
 function submitWordClicked(event){
   let currentWord = displayBox.innerText
   if (currentWord.length > 2){
+
+    let currentGameId = sessionStorage.getItem("game_ids").split(",")[0]
     sendWordToBackend(currentWord,currentGameId)
   }
 
@@ -205,18 +222,18 @@ function sendWordToBackend(word, game_id = 0){
 
 function renderLetter(e){
   let currentButton = event.target
-  
+
   if(displayBox.dataset.usedButtons && displayBox.dataset.usedButtons.includes(currentButton.id)){
     // there are usedButtons and the current button is used
     // do nothing
-  } else { 
+  } else {
     // its an unused button
     // add to dataset and add to displaybox
     addButtonToDataSet(currentButton)
     displayBox.innerText = displayBox.innerText + currentButton.innerText
   }
-  
-   
+
+
 
 }
 
@@ -230,17 +247,25 @@ function listWord(word){
   displayBox.innerText = ""
 }
 
+function clearWordList() {
+  let wordUl = document.getElementById("word-list")
+  wordUl.innerHTML = ""
+}
+
 function startGameTimer(timeLimit){
   // starts a timer for the game, calls gameTimerEnded after elapsed time
   // time limit is the number of minutes the game will last
   let endTime = timeLimit*60*1000
   window.setTimeout(gameTimerEnded, endTime)
 }
+
 function gameTimerEnded(){
   let roundMemberList = sessionStorage.getItem("usernames").split(",")
   if(roundMemberList.length != 0){
     updateRoundMemberList()
-    startVisualGame(nextPlayer)
+    updateRoundGamesList()
+
+    startVisualGame()
 
   }else {
     submitEndedRound()
@@ -255,10 +280,14 @@ function gameTimerEnded(){
   // should submit ended game and start new game if appropriate
   //clear sessionStorage
 }
+
 function startVisualGame(){
-  startTimerCountDown(3)
-  startGameTimer(3)
-  displayBox = ""
+  startTimerCountDown(1)
+  startGameTimer(1)
+  clearCurrentWord()
+  clearWordList()
+
+
   //reset timerCountDown/
   //clear displayBox
   //display currentPlayer
@@ -284,14 +313,16 @@ function updateBoardLetters(letter_pop){
     currentButton.innerText = letter
   })
 }
+
 updateBoardLetters("letsgoteamschema")
 
-startTimerCountDown(3)
+
 function startTimerCountDown(timeLimit){
   // time limit is the number of minutes the game will last
   timerCountDown.innerText=`${timeLimit}:00`
   window.setInterval(updateTimerCountDown,1000)
 }
+
 function getTimerCountDown(){
 
   let [minutes, seconds] = timerCountDown.innerText.split(":")
@@ -301,6 +332,7 @@ function getTimerCountDown(){
 
   return seconds
 }
+
 function updateTimerCountDown(){
   let currentTime = getTimerCountDown()
   if (currentTime > 0){
@@ -308,6 +340,7 @@ function updateTimerCountDown(){
   }
 
 }
+
 function setTimerCountDown(timeLeft){
   let minutes = Math.floor(timeLeft/60)
   let seconds = timeLeft%60
@@ -320,7 +353,7 @@ function setTimerCountDown(timeLeft){
 
 
 function addButtonToDataSet(buttonElement){
-  
+
   if (displayBox.dataset.usedButtons){
     displayBox.dataset.usedButtons += " " + buttonElement.id
   } else {
@@ -334,7 +367,7 @@ function clearButtonDataSet(){
 
 function getAllGameWordsFromServer(gameIdArray=[1,2,3,4]){
   // test with default [1,2,3,4]
-  // takes an array of game_ids and sends them to the api 
+  // takes an array of game_ids and sends them to the api
   // route is the games index
   let bodyObj = {
     game_ids: gameIdArray
@@ -354,7 +387,7 @@ function getAllGameWordsFromServer(gameIdArray=[1,2,3,4]){
     })
     .then(function(userWordArray){
       // response should be an array
-      // of objects with structure 
+      // of objects with structure
       // {user: username, words:[word1,word2,...] }
       userWordArray.forEach(userWord=>displayGameWords(userWord))
     })
@@ -364,7 +397,7 @@ function getAllGameWordsFromServer(gameIdArray=[1,2,3,4]){
 
   }
   function displayGameWords(userWordObject){
-    // input should be an object with structure 
+    // input should be an object with structure
     // {user: username, words:[word1,word2,...] }
     let userNameHeader = document.createElement("h2")
     userNameHeader.innerText = userWordObject.user
@@ -377,7 +410,7 @@ function getAllGameWordsFromServer(gameIdArray=[1,2,3,4]){
     document.getElementById("round-word-list").append(userNameHeader, wordList)
 
   }
-  getAllGameWordsFromServer([5,6,7,8])
+
 
 
 })
