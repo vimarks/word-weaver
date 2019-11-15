@@ -165,6 +165,7 @@ clearButton.addEventListener("click", clearCurrentWord)
 
 function clearCurrentWord(e){
   clearButtonDataSet()
+  buttonsArray.forEach(button=> {enableButton(button)})
   displayBox.innerText = ""
 }
 
@@ -236,13 +237,17 @@ function renderLetter(e){
     // its an unused button
     // add to dataset and add to displaybox
     addButtonToDataSet(currentButton)
+    disableButton(currentButton)
     displayBox.innerText = displayBox.innerText + currentButton.innerText
   }
-
-
-
 }
 
+function disableButton(button){
+  button.disabled=true
+}
+function enableButton(button){
+  button.removeAttribute("disabled")
+}
 
 function listWord(word){
   // finds UL, creates new li, appends li to ul

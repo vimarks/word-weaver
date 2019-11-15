@@ -4,3 +4,6 @@
 
   margin:5px;
 }
+.btn:disabled{
+  color:black
+}
