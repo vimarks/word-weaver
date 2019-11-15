@@ -290,13 +290,15 @@ function gameTimerEnded(){
   clearInterval(timerCountDownInterval)
   let roundMemberList = sessionStorage.getItem("usernames").split(",")
   if(roundMemberList.length != 1){
-    debugger;
+
     updateRoundMemberList()
     updateRoundGamesList()
     startVisualGame()
 
 
   }else {
+    clearWordList()
+    updateRoundGamesList()
     submitEndedRound()
     endRound()
   }
@@ -325,7 +327,7 @@ function startVisualGame(){
 
 function submitEndedRound(){
 
-  let currentGames = sessionStorage.getItem("game_ids").split(",")
+  let currentGames = sessionStorage.getItem("completed_games").split(",").filter(function(gameId){return gameId.length>0})
   getAllGameWordsFromServer(currentGames)
 }
 
@@ -462,6 +464,6 @@ function getAllGameWordsFromServer(gameIdArray=[1,2,3,4]){
 
   }
 
-  
+
 
 })
