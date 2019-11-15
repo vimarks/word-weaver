@@ -181,6 +181,7 @@ clearButton.addEventListener("click", clearCurrentWord)
 
 function clearCurrentWord(e){
   clearButtonDataSet()
+  buttonsArray.forEach(button=> {enableButton(button)})
   displayBox.innerText = ""
 }
 
@@ -252,13 +253,17 @@ function renderLetter(e){
     // its an unused button
     // add to dataset and add to displaybox
     addButtonToDataSet(currentButton)
+    disableButton(currentButton)
     displayBox.innerText = displayBox.innerText + currentButton.innerText
   }
-
-
-
 }
 
+function disableButton(button){
+  button.disabled=true
+}
+function enableButton(button){
+  button.removeAttribute("disabled")
+}
 
 function listWord(word){
   // finds UL, creates new li, appends li to ul
@@ -436,16 +441,27 @@ function getAllGameWordsFromServer(gameIdArray=[1,2,3,4]){
     // {user: username, words:[word1,word2,...] }
     let userNameHeader = document.createElement("h2")
     userNameHeader.innerText = userWordObject.user
+    let wordCountHeader = document.createElement("h3")
+    wordCountHeader.innerText = `Found ${userWordObject.words.length} words`
+    let longWord = userWordObject.words.reduce(function(longest, word){
+      if(longest.length<word.length){
+        return word
+      } else {
+        return longest
+      }
+    })
+    let wordLengthHeader = document.createElement("h3")
+    wordLengthHeader.innerText = `Longest word: ${longWord}, ${longWord.length} characters`
     let wordList = document.createElement("ul")
     userWordObject.words.forEach(word=>{
       let userWordLi = document.createElement("li")
       userWordLi.innerText = word
       wordList.append(userWordLi)
     })
-    document.getElementById("round-word-list").append(userNameHeader, wordList)
+    document.getElementById("round-word-list").append(userNameHeader,wordCountHeader,wordLengthHeader, wordList)
 
   }
 
-
+  
 
 })

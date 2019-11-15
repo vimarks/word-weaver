@@ -4,6 +4,11 @@
 
   margin:5px;
 }
+
+.btn:disabled{
+  color:black
+}
+
 .btn90{
   transform: rotate(90deg)
 }
@@ -29,3 +34,4 @@
   justify-content: center;
 
 }
+
