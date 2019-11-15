@@ -4,3 +4,28 @@
 
   margin:5px;
 }
+.btn90{
+  transform: rotate(90deg)
+}
+
+.btn180{
+  transform: rotate(180deg);
+}
+
+
+.btn270{
+  transform: rotate(270deg)
+}
+
+#board-container{
+  text-align: center;
+}
+
+
+#timer-count-down{
+
+  font-size: -webkit-xxx-large;
+  display: flex;
+  justify-content: center;
+
+}
