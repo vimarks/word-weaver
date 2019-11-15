@@ -25,9 +25,23 @@ function showBoard(){
   buttonsArray.forEach((button) => {button.classList.add("visibility")})
   let gameDisplay = document.querySelectorAll(".visibility")
   gameDisplay.forEach(function(element){
-   element.style.display = "initial"
+   element.style.display = "inline"
   })
 }
+
+function hideSetupMenu() {
+  let setupMenu = document.querySelectorAll(".welcome-form")
+  setupMenu.forEach(function(e){
+    e.style.display = "none"
+  })
+}
+
+function rotateLetters(){
+  let letterButtons = document.querySelectorAll(".letter-button")
+}
+
+
+
 
 
 
@@ -109,8 +123,10 @@ function startRound(e){
     updateBoardLetters(boardString)
 
     let player = sessionStorage.getItem("usernames").split(",")[0]
+
     startVisualGame(player)
     displayCurrentPlayer()
+    hideSetupMenu()
     // gameTimerEnded()
 
   })
@@ -271,25 +287,27 @@ function startGameTimer(timeLimit){
 }
 
 function gameTimerEnded(){
+  clearInterval(timerCountDownInterval)
   let roundMemberList = sessionStorage.getItem("usernames").split(",")
-  if(roundMemberList.length != 0){
+  if(roundMemberList.length != 1){
+    debugger;
     updateRoundMemberList()
     updateRoundGamesList()
     startVisualGame()
-    debugger;
+
 
   }else {
     submitEndedRound()
     endRound()
   }
 
-
-
-
-
-
   // should submit ended game and start new game if appropriate
   //clear sessionStorage
+}
+
+function endRound() {
+
+console.log("these aren't the rounds you're looking for")
 }
 
 function startVisualGame(){
@@ -306,7 +324,8 @@ function startVisualGame(){
 }
 
 function submitEndedRound(){
-  let currentGames = sessionStorage.getItem("games").split(",")
+
+  let currentGames = sessionStorage.getItem("game_ids").split(",")
   getAllGameWordsFromServer(currentGames)
 }
 
@@ -321,7 +340,7 @@ function updateBoardLetters(letter_pop){
     let row = Math.floor(index/4)+1
     let column = index%4+1
     // button id are formatted R1-L1
-    currentButton = document.getElementById(`R${row}-L${column}`)
+    let currentButton = document.getElementById(`R${row}-L${column}`)
     currentButton.innerText = letter
   })
 }
@@ -353,7 +372,7 @@ function updateTimerCountDown(){
     }
     setTimerCountDown(currentTime-1)
   } else if (currentTime == 0){
-    debugger
+
     clearInterval(timerCountDownInterval)
   }
 
@@ -409,9 +428,12 @@ function getAllGameWordsFromServer(gameIdArray=[1,2,3,4]){
       // {user: username, words:[word1,word2,...] }
       userWordArray.forEach(userWord=>displayGameWords(userWord))
     })
-    .catch(
-      window.alert("these aren't the games you're looking for")
-    )
+    .catch(error =>{
+      if( error.message){
+
+        window.alert(`${error.message} these aren't the games you're looking for`)
+      }
+    })
 
   }
   function displayGameWords(userWordObject){
