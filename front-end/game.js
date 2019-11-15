@@ -419,13 +419,18 @@ function getAllGameWordsFromServer(gameIdArray=[1,2,3,4]){
     // {user: username, words:[word1,word2,...] }
     let userNameHeader = document.createElement("h2")
     userNameHeader.innerText = userWordObject.user
+    let wordCountHeader = document.createElement("h3")
+    wordCountHeader.innerText = `Found ${userWordObject.words.length} words`
+    let longWord = userWordObject.words.reduce(function(memo, element){if(memo.length<element.length){return element} })
+    let wordLengthHeader = document.createElement("h3")
+    wordLengthHeader.innerText = `Longest word: ${longWord}, ${longWord.length} characters`
     let wordList = document.createElement("ul")
     userWordObject.words.forEach(word=>{
       let userWordLi = document.createElement("li")
       userWordLi.innerText = word
       wordList.append(userWordLi)
     })
-    document.getElementById("round-word-list").append(userNameHeader, wordList)
+    document.getElementById("round-word-list").append(userNameHeader,wordCountHeader,wordLengthHeader, wordList)
 
   }
 
