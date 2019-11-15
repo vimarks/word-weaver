@@ -428,7 +428,24 @@ function getAllGameWordsFromServer(gameIdArray=[1,2,3,4]){
       // response should be an array
       // of objects with structure
       // {user: username, words:[word1,word2,...] }
+
+      let winner = userWordArray.reduce(function(topScorer, userWord){
+        let points = userWord.words.reduce(function(totalCharacters,word){
+          return totalCharacters+word.length
+        },0)
+        if (topScorer.points<points){
+          return {user: userWord.username, points: points}
+        } else {
+          return topScorer
+        }
+      },{user:"no winner",points:0})
+      let winnerHeader = document.createElement("h1")
+      winnerHeader.innerText = `${winner.user} won the round with ${winner.points} points`
+      document.getElementById("round-word-list").append
+
       userWordArray.forEach(userWord=>displayGameWords(userWord))
+    
+    
     })
     .catch(error =>{
       if( error.message){
